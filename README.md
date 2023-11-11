@@ -11,7 +11,7 @@ Ce script Bash permet de trier les fichiers d'un répertoire en fonction de leur
 ---
 
 ## Utilisation
-
+```bash
 ./script.sh [-i repertoire_entree] [-o repertoire_sortie] [-m] [-s] [-h]
     -i : Chemin du répertoire d'entrée
     -o : Chemin du répertoire de sortie
@@ -19,7 +19,7 @@ Ce script Bash permet de trier les fichiers d'un répertoire en fonction de leur
     -s : Mode simulation (évalue les actions sans les exécuter)
     -h : Afficher ce message d'aide
     -n : (no logs) Execute silencieusement
-
+```
 ---
 
 ## Exemple
