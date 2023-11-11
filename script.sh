@@ -16,8 +16,8 @@
 #   -o : Chemin du répertoire de sortie
 #   -m : Déplacer les fichiers au lieu de les copier
 #   -s : Mode simulation (évalue les actions sans les exécuter)
-#   -h : Afficher ce message d'aide
 #   -n : (no logs) Execute silencieusement
+#   -h : Afficher ce message d'aide
 #
 # Exemple:
 #   script.sh -i /chemin/vers/repertoire_entree -o /chemin/vers/repertoire_sortie -m
@@ -48,15 +48,15 @@ error() {
 usage() {
     if ! $show_usage; then
     	cat <<- EOF
-    Utilisation: $myself [-i repertoire_entree] [-o repertoire_sortie] [-m] [-s] [-h]
+    Utilisation: $myself [-i repertoire_entree] [-o repertoire_sortie] [-m] [-s] [-n] [-h]
 
     Options:
         -i : Chemin du répertoire d'entrée
         -o : Chemin du répertoire de sortie
         -m : Déplacer les fichiers au lieu de les copier
         -s : Mode simulation (évalue les actions sans les exécuter)
-        -h : Afficher ce message d'aide
         -n : (no logs) Execute silencieusement
+        -h : Afficher ce message d'aide
 
     Exemple:
         $myself -i /chemin/vers/repertoire_entree -o /chemin/vers/repertoire_sortie -m
@@ -101,8 +101,9 @@ done
 # Vérifier si le dossier d'entrée existe
 [ ! -d "$input_dir" ] && error "Le dossier scpécifié n'existe pas." 1
 
+# Avertir l'utilisateur si les dossiers d'entée et de sortie sont identiques
 if [ "$input_dir" == "$output_dir" ]; then
-    display "Attention ! Les dossiers d'entrée et de sorties sont identiques"
+    display "Attention ! Les dossiers d'entrée et de sortie sont identiques"
     while true; do
         read -p "Voulez-vous continuer ? [o/n]: " choice
 
