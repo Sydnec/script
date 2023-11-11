@@ -28,7 +28,7 @@
 set -euo pipefail
 
 myself=$(basename "$0")
-dir=""
+input_dir=""
 output_dir=""
 move=false
 simulation=false
@@ -67,7 +67,7 @@ usage() {
 while getopts "i:o:msh" opt; do
     case $opt in
         i) # Chemin du répertoire d'entrée
-            dir="$OPTARG"
+            input_dir="$OPTARG"
             ;;
         o) # Chemin du répertoire de sortie
             output_dir="$OPTARG"
@@ -89,14 +89,14 @@ while getopts "i:o:msh" opt; do
 done
 
 # Si les dossier ne sont pas spécifiés, utiliser le dossier courant
-[ -z "$dir" ] && dir=$(pwd)
+[ -z "$input_dir" ] && input_dir=$(pwd)
 [ -z "$output_dir" ] && output_dir=$(pwd)
 
 # Vérifier si le dossier d'entrée existe
-[ ! -d "$dir" ] && error "Le dossier scpécifié n'existe pas." 1
+[ ! -d "$input_dir" ] && error "Le dossier scpécifié n'existe pas." 1
 
 # Parcourir le dossier et ses sous-dossiers
-find "$dir" -type f -print0 | xargs -0 file -i | while read -r mime_type; do
+find "$input_dir" -type f -print0 | xargs -0 file -i | while read -r mime_type; do
     # Récupérer les variables
     source_file=$(echo "$mime_type" | awk -F':' '{print $1}')
     fileName=$(basename "$source_file")
