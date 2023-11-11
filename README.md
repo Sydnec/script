@@ -6,7 +6,8 @@
 ## Description
 
 Ce script Bash permet de trier les fichiers d'un répertoire en fonction de leurs types.
-Il offre des options pour spécifier les répertoires d'entrée et de sortie, choisir entre le déplacement et la copie des fichiers, activer le mode simulation pour évaluer les actions, effectuer le traitement silencieusement, et afficher une aide.
+Il offre des options pour spécifier les répertoires d'entrée et de sortie, choisir entre le déplacement et la copie des fichiers,
+activer le mode simulation pour évaluer les actions, effectuer le traitement silencieusement, et afficher une aide.
 
 ---
 
