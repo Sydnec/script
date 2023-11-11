@@ -27,7 +27,6 @@
 
 set -euo pipefail
 
-nargs=$#
 myself=$(basename "$0")
 dir=""
 output_dir=""
