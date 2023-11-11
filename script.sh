@@ -101,6 +101,25 @@ done
 # Vérifier si le dossier d'entrée existe
 [ ! -d "$input_dir" ] && error "Le dossier scpécifié n'existe pas." 1
 
+if [ "$input_dir" == "$output_dir" ]; then
+    display "Attention ! Les dossiers d'entrée et de sorties sont identiques"
+    while true; do
+        read -p "Voulez-vous continuer ? [o/n]: " choice
+
+        case "$choice" in
+            [oO])
+                break
+                ;;
+            [nN])
+                error "Abandon" 0;
+                ;;
+            *)
+                display "Choix invalide. [o/n]"
+                ;;
+        esac
+    done
+fi
+
 # Parcourir le dossier et ses sous-dossiers
 find "$input_dir" -type f -print0 | xargs -0 file -i | while read -r mime_type; do
     # Récupérer les variables
