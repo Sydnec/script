@@ -17,6 +17,7 @@
 #   -m : Déplacer les fichiers au lieu de les copier
 #   -s : Mode simulation (évalue les actions sans les exécuter)
 #   -h : Afficher ce message d'aide
+#   -n : (no logs) Execute silencieusement
 #
 # Exemple:
 #   script.sh -i /chemin/vers/repertoire_entree -o /chemin/vers/repertoire_sortie -m
@@ -33,6 +34,7 @@ output_dir=""
 move=false
 simulation=false
 show_usage=false
+no_logs=false
 
 display() {
     printf -- "%s\n" "$1"
@@ -54,6 +56,7 @@ usage() {
         -m : Déplacer les fichiers au lieu de les copier
         -s : Mode simulation (évalue les actions sans les exécuter)
         -h : Afficher ce message d'aide
+        -n : (no logs) Execute silencieusement
 
     Exemple:
         $myself -i /chemin/vers/repertoire_entree -o /chemin/vers/repertoire_sortie -m
@@ -64,7 +67,7 @@ usage() {
 }
 
 # Traiter les options
-while getopts "i:o:msh" opt; do
+while getopts "i:o:mshn" opt; do
     case $opt in
         i) # Chemin du répertoire d'entrée
             input_dir="$OPTARG"
@@ -77,6 +80,9 @@ while getopts "i:o:msh" opt; do
             ;;
         s) # Mode simulation (évalue les actions sans les exécuter)
             simulation=true
+            ;;
+        n) # no logs
+            no_logs=true
             ;;
         h) # Afficher le message d'aide
             usage
@@ -114,9 +120,11 @@ find "$input_dir" -type f -print0 | xargs -0 file -i | while read -r mime_type; 
     fi
 
     # Logs
-    [ ! -d "$destination_dir" ] && display "Création de \"$destination_dir\"" #Logs de création de dossier
-    [ "$move"  == true ] && verb="Déplacement" || verb="Copie"
-    display "$verb du fichier \"$source_file\" vers \"$destination_dir/$fileName.$fileExt\"" | sed 's#//*#/#g' #Logs de deplacement/copie du fichier
+    if [ "$no_logs" == false ]; then
+        [ ! -d "$destination_dir" ] && display "Création de \"$destination_dir\"" #Logs de création de dossier
+        [ "$move"  == true ] && verb="Déplacement" || verb="Copie"
+        display "$verb du fichier \"$source_file\" vers \"$destination_dir/$fileName.$fileExt\"" | sed 's#//*#/#g' #Logs de deplacement/copie du fichier
+    fi
 
     # Action
     if [ "$simulation" == false ]; then
@@ -125,4 +133,4 @@ find "$input_dir" -type f -print0 | xargs -0 file -i | while read -r mime_type; 
     fi
 done
 
-display "Tri effectué avec succès."
+[ "$no_logs" == false ] && display "Tri effectué avec succès."
