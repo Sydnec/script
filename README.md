@@ -33,4 +33,4 @@ activer le mode simulation pour évaluer les actions, effectuer le traitement si
 
 ## Auteur
 
-Simon Bourlier
+Sydnec
