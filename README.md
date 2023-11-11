@@ -12,13 +12,13 @@ Ce script Bash permet de trier les fichiers d'un répertoire en fonction de leur
 
 ## Utilisation
 ```bash
-./script.sh [-i repertoire_entree] [-o repertoire_sortie] [-m] [-s] [-h]
+./script.sh [-i repertoire_entree] [-o repertoire_sortie] [-m] [-s] [-n] [-h]
     -i : Chemin du répertoire d'entrée
     -o : Chemin du répertoire de sortie
     -m : Déplacer les fichiers au lieu de les copier
     -s : Mode simulation (évalue les actions sans les exécuter)
-    -h : Afficher ce message d'aide
     -n : (no logs) Execute silencieusement
+    -h : Afficher ce message d'aide
 ```
 ---
 
