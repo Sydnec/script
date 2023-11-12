@@ -141,7 +141,7 @@ find "$input_dir" -type f -print0 | xargs -0 file -i | while read -r mime_type; 
 
     # Logs
     if [ "$no_logs" == false ]; then
-        [ ! -d "$destination_dir" ] && display "Création de \"$destination_dir\"" #Logs de création de dossier
+        [ ! -d "$destination_dir" ] && display "Création de \"$destination_dir\"" | sed 's#//*#/#g' #Logs de création de dossier
         [ "$move"  == true ] && verb="Déplacement" || verb="Copie"
         display "$verb du fichier \"$source_file\" vers \"$destination_dir/$fileName.$fileExt\"" | sed 's#//*#/#g' #Logs de deplacement/copie du fichier
     fi
