@@ -1,1 +1,1 @@
-./script.sh -i data/ -o output/
+./script.sh -si data/ -o output/
