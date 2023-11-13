@@ -33,6 +33,7 @@ set -euo pipefail
 
 # Déclaration des variables
 myself=$(basename "$0") # Nom du script
+dir="$(pwd)" # Dossier depuis lequel est exécuté le script
 no_logs=false
 move=false
 overwrite=false
@@ -114,13 +115,13 @@ getExtension() {
 }
 
 # Traiter les options
-while getopts "i:o:mesnl:h" opt; do
+while getopts ":i:o:mesnl:h" opt; do
     case "$opt" in
     i) # Chemin du répertoire d'entrée
-        input_dir="$OPTARG"
+        [ -n "$OPTARG" ] && input_dir="$OPTARG" || input_dir="$dir"
         ;;
     o) # Chemin du répertoire de sortie
-        output_dir="$OPTARG"
+        [ -n "$OPTARG" ] && output_dir="$OPTARG" || output_dir="$dir"
         ;;
     m) # Déplacer les fichiers au lieu de les copier
         move=true
