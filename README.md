@@ -13,7 +13,7 @@ activer le mode simulation pour évaluer les actions, effectuer le traitement si
 
 ## Utilisation
 
-```bash
+```
 ./script.sh [-i repertoire_entree] [-o repertoire_sortie] [-m] [-s] [-n] [-l repertoire_logs] [-e] [-h]
     -i : Chemin du répertoire d'entrée
     -o : Chemin du répertoire de sortie
