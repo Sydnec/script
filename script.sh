@@ -53,9 +53,9 @@ error() {
     local RED="\033[0;31m"
     local RESET_COLOR="\033[0m"
     if [ "$2" == -1 ]; then # Erreur non bloquante
-        [ -n "$logs_dir" ] && printf "${RED}[$(date '+[%Y/%m/%d-%H:%M:%S]') Error: %s\n${RESET_COLOR}" "$1" >&2 || printf "${RED}Error: %s\n${RESET_COLOR}" "$1" >&2
+        >&2 printf "${RED}%s\n${RESET_COLOR}" "$(display "Error: $1")" 
     else # Erreur bloquante
-        [ -n "$logs_dir" ] && printf "$(date '+[%Y/%m/%d-%H:%M:%S]') Error: %s\n" "$1" >&2 || printf "Error: %s\n" "$1" >&2
+        >&2 display "Error: %s\n"
         exit "$2"
     fi
 }
