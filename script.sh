@@ -22,7 +22,7 @@
 #   -h : Afficher ce message d'aide
 #
 # Exemple:
-#   script.sh -i /chemin/vers/repertoire_entree -o /chemin/vers/repertoire_sortie -m
+#   script.sh -mei /chemin/vers/repertoire_entree -o /chemin/vers/repertoire_sortie -l ./vers/logs
 #
 # Auteur:
 #   Simon Bourlier
@@ -36,12 +36,10 @@ no_logs=false
 move=false
 overwrite=false
 simulate=false
-show_usage=false
 logs_dir=""
-input_dir="." # Prend par défaut le dossier dans lequel a été appelé le script
-# Créer un dossier unique en sortie si celui-ci n'est pas renseigné
-output_dir="output_$(printf '%x\n' "$(date '+%Y%m%d%H%M%S')")"
-
+input_dir="."                                                  # Prend par défaut le dossier dans lequel a été appelé le script
+output_dir="output_$(printf '%x\n' "$(date '+%Y%m%d%H%M%S')")" # Créer un dossier unique en sortie si celui-ci n'est pas renseigné
+show_usage=false
 
 # Déclaration des fonctions
 display() {
@@ -51,17 +49,19 @@ display() {
 }
 
 error() {
+    local RED="\033[0;31m"
+    local RESET_COLOR="\033[0m"
     if [ "$2" == -1 ]; then # Erreur non bloquante
-        [ -n "$logs_dir" ] && printf "\033[0;31m$(date '+[%Y/%m/%d-%H:%M:%S]') Error: %s\n\033[0m" "$1" >&2
-    else                    # Erreur bloquante
-        [ -n "$logs_dir" ] && printf "$(date '+[%Y/%m/%d-%H:%M:%S]') Error: %s\n" "$1" >&2
+        [ -n "$logs_dir" ] && printf "${RED}[$(date '+[%Y/%m/%d-%H:%M:%S]') Error: %s\n${RESET_COLOR}" "$1" >&2 || printf "${RED}Error: %s\n${RESET_COLOR}" "$1" >&2
+    else # Erreur bloquante
+        [ -n "$logs_dir" ] && printf "$(date '+[%Y/%m/%d-%H:%M:%S]') Error: %s\n" "$1" >&2 || printf "Error: %s\n" "$1" >&2
         exit "$2"
     fi
 }
 
 usage() {
     if ! $show_usage; then
-        cat <<- EOF
+        cat <<-EOF
     Utilisation: $myself [-i repertoire_entree] [-o repertoire_sortie] [-m] [-s] [-n] [-l repertoire_logs] [-e] [-h]
 
     Options:
@@ -75,7 +75,7 @@ usage() {
         -h : Afficher ce message d'aide
 
     Exemple:
-        $myself -mei /chemin/vers/repertoire_entree -o /chemin/vers/repertoire_sortie -l /chemin/vers/logs
+        $myself -mei /chemin/vers/repertoire_entree -o /chemin/vers/repertoire_sortie -l ./vers/logs
 
 		EOF
         show_usage=true
@@ -83,60 +83,68 @@ usage() {
 }
 
 # Gestion des extensions non reconnue par la commande file
-unknown_mime_type() { 
-    local type=$(echo "$1" | awk -F'/' '{print $2}')
-    case "$type" in
+getExtension() {
+    local FILE="$1"
+    local TYPE=$(echo "$2" | awk -F'/' '{print $2}')
+    local fileExt="$(file -b --extension $file | awk -F'/' '{print $1}' | sed -e 's/^ *//;s/ *$//')"
+    # Tente de reconnaitre les extensions inconnues en fonction de son mime_type
+    if [ "$fileExt" == "???" ]; then
+        case "$TYPE" in
         mpeg | zip | mp4 | html)
-            echo "$type"
+            echo ".$TYPE"
             ;;
         x-shellscript)
-            echo "sh"
+            echo ".sh"
             ;;
         x-m4a)
-            echo "m4a"
+            echo ".m4a"
             ;;
         plain)
-            echo "txt"
+            echo ".txt"
             ;;
         *)
-            echo "???"
+            error "Extension pour $file type $mime_type non reconnue" -1
+            echo ""
             ;;
-    esac
+        esac
+    else
+        echo ".$fileExt"
+    fi
 }
 
 # Traiter les options
-while getopts "i:o:l:meshn" opt; do
+while getopts "i:o:mesnl:h" opt; do
     case "$opt" in
-        i) # Chemin du répertoire d'entrée
-            input_dir="$OPTARG"
-            ;;
-        o) # Chemin du répertoire de sortie
-            output_dir="$OPTARG"
-            ;;
-        m) # Déplacer les fichiers au lieu de les copier
-            move=true
-            ;;
-        e) # Ecrase les fichier de destintations s'ils existent déjà
-            overwrite=true
-            ;;
-        s) # Mode simulation (évalue les actions sans les exécuter)
-            simulate=true
-            ;;
-        n) # no logs
-            no_logs=true
-            ;;
-        l) # Rediriger les logs dans un dossier externe
-            [ -n "$OPTARG" ] && logs_dir="$OPTARG" || logs_dir=".logs"
-            mkdir -p "$logs_dir"
-            exec > >(tee -a "$logs_dir/out.log") 2> >(tee -a "$logs_dir/error.log")
-            ;;
-        h) # Afficher le message d'aide
-            usage
-            exit 0;
-            ;;
-        \?)
-            error "Utilisation: $myself [-i repertoire_entree] [-o repertoire_sortie] [-m] [-s] [-n] [-l repertoire_logs] [-e] [-h]"
-            ;;
+    i) # Chemin du répertoire d'entrée
+        input_dir="$OPTARG"
+        ;;
+    o) # Chemin du répertoire de sortie
+        output_dir="$OPTARG"
+        ;;
+    m) # Déplacer les fichiers au lieu de les copier
+        move=true
+        ;;
+    e) # Ecrase les fichier de destintations s'ils existent déjà
+        overwrite=true
+        ;;
+    s) # Mode simulation (évalue les actions sans les exécuter)
+        simulate=true
+        ;;
+    n) # no logs
+        no_logs=true
+        ;;
+    l) # Rediriger les logs dans un dossier externe
+        [ -n "$OPTARG" ] && logs_dir="$OPTARG" || logs_dir=".logs"
+        mkdir -p "$logs_dir"
+        exec > >(tee -a "$logs_dir/out.log") 2> >(tee -a "$logs_dir/error.log")
+        ;;
+    h) # Afficher le message d'aide
+        usage
+        exit 0
+        ;;
+    \?)
+        error "Utilisation: $myself [-i repertoire_entree] [-o repertoire_sortie] [-m] [-s] [-n] [-l repertoire_logs] [-e] [-h]"
+        ;;
     esac
 done
 
@@ -146,37 +154,36 @@ done
 # Parcourir le dossier et ses sous-dossiers
 files=$(find "$input_dir" -type f)
 total_files=$(display "$files" | wc -l | sed -e 's/^ *//;s/ *$//')
-longueurFormat="%0${#total_files}d"
+longueur_format="%0${#total_files}d"
 processed_files=0
 # Traiter les fichiers
 for file in $files; do
-    mime_type=$(file -b --mime-type $file | sed -e 's/^ *//;s/ *$//')
-    fileExt="$(file -b --extension $file | awk -F'/' '{print $1}' | sed -e 's/^ *//;s/ *$//')"
-    # Gestion des extensions inconnus par file
-    [ $fileExt == "???" ] && fileExt="$(unknown_mime_type "$mime_type")" && [ $fileExt == "???" ] && error "Extension pour $file type $mime_type non reconnue" -1 &&  fileExt="" || fileExt=".$fileExt"
-    # Récupérer les variables utiles
-    fileName=$(basename "$file")
+    mime_type=$(file -b --mime-type "$file" | sed -e 's/^ *//;s/ *$//')
+    file_ext=$(getExtension "$file" "$mime_type")
+
+    # Récupérer les constantes utiles
+    file_name=$(basename "$file")
     destination_dir="$output_dir/$mime_type"
 
     # Vérifier si le fichier de destination existe
-    if [ "$overwrite" == false ] && [ -e "$destination_dir/$fileName$fileExt" ]; then
+    if [ "$overwrite" == false ] && [ -e "$destination_dir/$file_name$file_ext" ]; then
         # Renommer le fichier en ajoutant un compteur
         cpt=1
-        while [ -e "$destination_dir/$fileName.$cpt$fileExt" ]; do
+        while [ -e "$destination_dir/$file_name.$cpt$file_ext" ]; do
             ((cpt += 1))
         done
-        fileName="$fileName.$cpt"
+        file_name="$file_name.$cpt"
     fi
-    
+
     # Logs
-    [ "$move"  == true ] && verb="Déplacement" || verb="Copie"
+    [ "$move" == true ] && verb="Déplacement" || verb="Copie"
     ((processed_files += 1))
-    display "[$(printf $longueurFormat $processed_files)/$total_files] ($fileExt) $verb de \"$file\" → \"$destination_dir/$fileName$fileExt\"" # Logs de deplacement/copie du fichier
+    display "[$(printf "$longueur_format" "$processed_files")/$total_files] ($file_ext) $verb de $file → $destination_dir/$file_name$file_ext" # Logs de deplacement/copie du fichier
 
     # Action
     if [ "$simulate" == false ]; then
         mkdir -p "$destination_dir"
-        [ "$move"  == true ] && mv -f "$file" "$destination_dir/$fileName$fileExt" || cp -f "$file" "$destination_dir/$fileName$fileExt" # Déplacement/Copie du fichier
+        [ "$move" == true ] && mv -f "$file" "$destination_dir/$file_name$file_ext" || cp -f "$file" "$destination_dir/$file_name$file_ext" # Déplacement/Copie du fichier
     fi
 done
 

@@ -1,5 +1,5 @@
 # Script de Tri de Fichiers par Types
-### Version 1.0 du 11 novembre 2023
+### Version 1.1 du 11 novembre 2023
 
 ---
 
@@ -12,25 +12,29 @@ activer le mode simulation pour évaluer les actions, effectuer le traitement si
 ---
 
 ## Utilisation
-```
-./script.sh [-i repertoire_entree] [-o repertoire_sortie] [-m] [-s] [-n] [-h]
+
+```bash
+./script.sh [-i repertoire_entree] [-o repertoire_sortie] [-m] [-s] [-n] [-l repertoire_logs] [-e] [-h]
     -i : Chemin du répertoire d'entrée
     -o : Chemin du répertoire de sortie
     -m : Déplacer les fichiers au lieu de les copier
+    -e : Ecrase les fichiers de destination s'ils existent déjà
     -s : Mode simulation (évalue les actions sans les exécuter)
-    -n : (no logs) Execute silencieusement
+    -n : (no logs) Exécute silencieusement
+    -l : Rediriger les logs dans un dossier externe
     -h : Afficher ce message d'aide
 ```
+
 ---
 
 ## Exemple
 
 ```bash
-./script.sh -i /chemin/vers/repertoire_entree -o /chemin/vers/repertoire_sortie -m
+./script.sh -mei /chemin/vers/repertoire_entree -o /chemin/vers/repertoire_sortie -l ./vers/logs
 ```
 
 ---
 
 ## Auteur
 
-Sydnec
+Simon Bourlier
