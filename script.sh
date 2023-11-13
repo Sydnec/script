@@ -51,8 +51,12 @@ display() {
 }
 
 error() {
-    printf "Error: %s\n" "$1" >&2
-    exit "$2"
+    if [ "$2" == -1 ]; then # Erreur non bloquante
+        [ -n "$logs_dir" ] && printf "\033[0;31m$(date '+[%Y/%m/%d-%H:%M:%S]') Error: %s\n\033[0m" "$1" >&2
+    else                    # Erreur bloquante
+        [ -n "$logs_dir" ] && printf "$(date '+[%Y/%m/%d-%H:%M:%S]') Error: %s\n" "$1" >&2
+        exit "$2"
+    fi
 }
 
 usage() {
@@ -149,9 +153,7 @@ for file in $files; do
     mime_type=$(file -b --mime-type $file | sed -e 's/^ *//;s/ *$//')
     fileExt="$(file -b --extension $file | awk -F'/' '{print $1}' | sed -e 's/^ *//;s/ *$//')"
     # Gestion des extensions inconnus par file
-    RED='\033[0;31m'
-    NC='\033[0m' # No Color
-    [ $fileExt == "???" ] && fileExt="$(unknown_mime_type "$mime_type")" && [ $fileExt == "???" ] && display "Extension pour $file type $mime_type non reconnue" &&  fileExt="" || fileExt=".$fileExt"
+    [ $fileExt == "???" ] && fileExt="$(unknown_mime_type "$mime_type")" && [ $fileExt == "???" ] && error "Extension pour $file type $mime_type non reconnue" -1 &&  fileExt="" || fileExt=".$fileExt"
     # Récupérer les variables utiles
     fileName=$(basename "$file")
     destination_dir="$output_dir/$mime_type"
@@ -161,14 +163,14 @@ for file in $files; do
         # Renommer le fichier en ajoutant un compteur
         cpt=1
         while [ -e "$destination_dir/$fileName.$cpt$fileExt" ]; do
-            ((cpt++))
+            ((cpt += 1))
         done
         fileName="$fileName.$cpt"
     fi
     
     # Logs
     [ "$move"  == true ] && verb="Déplacement" || verb="Copie"
-    ((processed_files++))
+    ((processed_files += 1))
     display "[$(printf $longueurFormat $processed_files)/$total_files] ($fileExt) $verb de \"$file\" → \"$destination_dir/$fileName$fileExt\"" # Logs de deplacement/copie du fichier
 
     # Action
