@@ -10,20 +10,20 @@
 # effectuer le traitement silencieusement, sortir les logs dans un fichier de log externe et afficher une aide.
 # 
 # Utilisation:
-#   Utilisation: script.sh [-i repertoire_entree] [-o repertoire_sortie] [-m] [-s] [-n] [-l [repertoire_logs]] [-e] [-h]
+#   Utilisation: script.sh [-i repertoire_entree] [-o repertoire_sortie] [-m] [-e] [-s] [-n] [-l repertoire_logs] [-h]
 #
 # Options:
 #   -i : Chemin du répertoire d'entrée
 #   -o : Chemin du répertoire de sortie
+#   -e : Ecrase les fichier de destintations s'ils existent déjà
 #   -m : Déplacer les fichiers au lieu de les copier
 #   -s : Mode simulation (évalue les actions sans les exécuter)
 #   -n : (no log) Execute silencieusement
 #   -l : Rediriger les logs dans un dossier externe
-#   -e : Ecrase les fichier de destintations s'ils existent déjà
 #   -h : Afficher ce message d'aide
 #
 # Exemple:
-#   script.sh -mei /chemin/vers/repertoire_entree -o /chemin/vers/repertoire_sortie -l
+#   script.sh -mei /chemin/vers/repertoire_entree -o /chemin/vers/repertoire_sortie -l ./vers/logs
 #
 # Auteur:
 #   Simon Bourlier
@@ -33,7 +33,6 @@ set -euo pipefail
 
 # Déclaration des variables
 myself=$(basename "$0") # Nom du script
-dir="$(pwd)" # Dossier depuis lequel est exécuté le script
 no_logs=false
 move=false
 overwrite=false
@@ -64,16 +63,16 @@ error() {
 usage() {
     if ! $show_usage; then
         cat <<-EOF
-    Utilisation: $myself [-i repertoire_entree] [-o repertoire_sortie] [-m] [-s] [-n] [-l [repertoire_logs]] [-e] [-h]
+    Utilisation: $myself [-i repertoire_entree] [-o repertoire_sortie] [-m] [-e] [-s] [-n] [-l repertoire_logs] [-h]
 
     Options:
         -i : Chemin du répertoire d'entrée
         -o : Chemin du répertoire de sortie
         -m : Déplacer les fichiers au lieu de les copier
+        -e : Ecrase les fichier de destintations s'ils existent déjà
         -s : Mode simulation (évalue les actions sans les exécuter)
         -n : (no log) Execute silencieusement
         -l : Rediriger les logs dans un dossier externe ("" pour prendre .logs/ par défaut)
-        -e : Ecrase les fichier de destintations s'ils existent déjà
         -h : Afficher ce message d'aide
 
     Exemple:
@@ -115,13 +114,13 @@ getExtension() {
 }
 
 # Traiter les options
-while getopts ":i:o:mesnl:h" opt; do
+while getopts "i:o:mesnl:h" opt; do
     case "$opt" in
     i) # Chemin du répertoire d'entrée
-        [ -n "$OPTARG" ] && input_dir="$OPTARG" || error "L'argument -i attend en paramètre le chemin du dossier à récupérer et trier. Cet argument est optionnel" 0
+        input_dir="$OPTARG"
         ;;
     o) # Chemin du répertoire de sortie
-        [ -n "$OPTARG" ] && output_dir="$OPTARG" || error "L'argument -o attend en paramètre le chemin du dossier où ranger les fichiers triés. Cet argument est optionnel" 0
+        output_dir="$OPTARG"
         ;;
     m) # Déplacer les fichiers au lieu de les copier
         move=true
@@ -145,7 +144,7 @@ while getopts ":i:o:mesnl:h" opt; do
         exit 0
         ;;
     \?)
-        error "Utilisation: $myself [-i repertoire_entree] [-o repertoire_sortie] [-m] [-s] [-n] [-l [repertoire_logs]] [-e] [-h]" 0
+        error "Utilisation: $myself [-i repertoire_entree] [-o repertoire_sortie] [-m] [-s] [-n] [-l repertoire_logs] [-e] [-h]"
         ;;
     esac
 done
