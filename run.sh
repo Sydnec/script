@@ -1,1 +1,0 @@
-./script.sh -si data/ -o output/
