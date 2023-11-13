@@ -1,7 +1,7 @@
 #!/bin/bash
 #
 # Script de Tri de Fichiers par Types
-# Version 1.1 du 11 novembre 2023
+# Version 1.1 du 13 novembre 2023
 #
 # Description:
 #   Ce script Bash permet de trier les fichiers d'un répertoire en fonction de leurs types.
