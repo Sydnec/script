@@ -1,5 +1,5 @@
 # Script de Tri de Fichiers par Types
-### Version 1.1 du 11 novembre 2023
+### Version 1.1 du 13 novembre 2023
 
 ---
 
