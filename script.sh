@@ -10,7 +10,7 @@
 # effectuer le traitement silencieusement, sortir les logs dans un fichier de log externe et afficher une aide.
 # 
 # Utilisation:
-#   Utilisation: script.sh [-i repertoire_entree] [-o repertoire_sortie] [-m] [-s] [-n] [-l repertoire_logs] [-e] [-h]
+#   Utilisation: script.sh [-i repertoire_entree] [-o repertoire_sortie] [-m] [-s] [-n] [-l [repertoire_logs]] [-e] [-h]
 #
 # Options:
 #   -i : Chemin du répertoire d'entrée
@@ -23,7 +23,7 @@
 #   -h : Afficher ce message d'aide
 #
 # Exemple:
-#   script.sh -mei /chemin/vers/repertoire_entree -o /chemin/vers/repertoire_sortie -l ./vers/logs
+#   script.sh -mei /chemin/vers/repertoire_entree -o /chemin/vers/repertoire_sortie -l
 #
 # Auteur:
 #   Simon Bourlier
@@ -64,7 +64,7 @@ error() {
 usage() {
     if ! $show_usage; then
         cat <<-EOF
-    Utilisation: $myself [-i repertoire_entree] [-o repertoire_sortie] [-m] [-s] [-n] [-l repertoire_logs] [-e] [-h]
+    Utilisation: $myself [-i repertoire_entree] [-o repertoire_sortie] [-m] [-s] [-n] [-l [repertoire_logs]] [-e] [-h]
 
     Options:
         -i : Chemin du répertoire d'entrée
@@ -118,10 +118,10 @@ getExtension() {
 while getopts ":i:o:mesnl:h" opt; do
     case "$opt" in
     i) # Chemin du répertoire d'entrée
-        [ -n "$OPTARG" ] && input_dir="$OPTARG" || input_dir="$dir"
+        [ -n "$OPTARG" ] && input_dir="$OPTARG" || error "L'argument -i attend en paramètre le chemin du dossier à récupérer et trier. Cet argument est optionnel" 0
         ;;
     o) # Chemin du répertoire de sortie
-        [ -n "$OPTARG" ] && output_dir="$OPTARG" || output_dir="$dir"
+        [ -n "$OPTARG" ] && output_dir="$OPTARG" || error "L'argument -o attend en paramètre le chemin du dossier où ranger les fichiers triés. Cet argument est optionnel" 0
         ;;
     m) # Déplacer les fichiers au lieu de les copier
         move=true
@@ -145,7 +145,7 @@ while getopts ":i:o:mesnl:h" opt; do
         exit 0
         ;;
     \?)
-        error "Utilisation: $myself [-i repertoire_entree] [-o repertoire_sortie] [-m] [-s] [-n] [-l repertoire_logs] [-e] [-h]"
+        error "Utilisation: $myself [-i repertoire_entree] [-o repertoire_sortie] [-m] [-s] [-n] [-l [repertoire_logs]] [-e] [-h]" 0
         ;;
     esac
 done
