@@ -1,4 +1,4 @@
-#! /usr/bin/env bash
+#!/bin/bash
 #
 # Script de Tri de Fichiers par Types
 # Version 1.0 du 11 novembre 2023
@@ -47,7 +47,7 @@ error() {
 
 usage() {
     if ! $show_usage; then
-    	cat <<- EOF
+        cat <<- EOF
     Utilisation: $myself [-i repertoire_entree] [-o repertoire_sortie] [-m] [-s] [-n] [-h]
 
     Options:
@@ -62,7 +62,7 @@ usage() {
         $myself -i /chemin/vers/repertoire_entree -o /chemin/vers/repertoire_sortie -m
 
 		EOF
-		show_usage=true
+        show_usage=true
     fi
 }
 
@@ -99,9 +99,9 @@ done
 [ -z "$output_dir" ] && output_dir=$(pwd)
 
 # Vérifier si le dossier d'entrée existe
-[ ! -d "$input_dir" ] && error "Le dossier scpécifié n'existe pas." 1
+[ ! -d "$input_dir" ] && error "Le dossier spécifié n'existe pas." 1
 
-# Avertir l'utilisateur si les dossiers d'entée et de sortie sont identiques
+# Avertir l'utilisateur si les dossiers d'entrée et de sortie sont identiques
 if [ "$input_dir" == "$output_dir" ]; then
     display "Attention ! Les dossiers d'entrée et de sortie sont identiques"
     while true; do
@@ -122,11 +122,11 @@ if [ "$input_dir" == "$output_dir" ]; then
 fi
 
 # Parcourir le dossier et ses sous-dossiers
-find "$input_dir" -type f -print0 | xargs -0 file -i | while read -r mime_type; do
+find "$input_dir" -type f -print0 | xargs -0 file --mime-type | while read -r mime_type; do
     # Récupérer les variables
     source_file=$(echo "$mime_type" | awk -F':' '{print $1}')
     fileName=$(basename "$source_file")
-    fileExt=$(echo "$mime_type" | awk -F':' '{print $2}' | awk -F'/' '{print $2}' | awk -F';' '{print $1}')
+    fileExt=$(echo "$mime_type" | awk -F':' '{print $2}' | awk -F' ' '{print $2}')
     destination_dir="$output_dir/$(echo "$mime_type" | awk -F': ' '{print $2}' | awk -F'/' '{print $1}' | sed -e 's/^ *//;s/ *$//')"
 
     # Vérifier si le fichier de destination existe
