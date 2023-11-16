@@ -15,7 +15,7 @@ effectuer le traitement silencieusement, sortir les logs dans un fichier de log 
 ## Utilisation
 
 ```
-./script.sh [-i repertoire_entree] [-o repertoire_sortie] [-m] [-e] [-s] [-n] [-l repertoire_logs] [-h]
+./tri_fichier.sh [-i repertoire_entree] [-o repertoire_sortie] [-m] [-e] [-s] [-n] [-l repertoire_logs] [-h]
     -i : Chemin du répertoire d'entrée
     -o : Chemin du répertoire de sortie
     -m : Déplacer les fichiers au lieu de les copier
@@ -31,7 +31,7 @@ effectuer le traitement silencieusement, sortir les logs dans un fichier de log 
 ## Exemple
 
 ```bash
-./script.sh -mei /chemin/vers/repertoire_entree -o /chemin/vers/repertoire_sortie -l ./vers/logs
+./tri_fichier.sh -mei /chemin/vers/repertoire_entree -o /chemin/vers/repertoire_sortie -l ./vers/logs
 ```
 
 ---
