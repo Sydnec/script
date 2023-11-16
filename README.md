@@ -1,5 +1,5 @@
 # Script de Tri de Fichiers par Types
-### Version 1.1 du 13 novembre 2023
+### Version 1.2 du 16 novembre 2023
 
 ---
 
@@ -7,7 +7,7 @@
 
 Ce script Bash permet de trier les fichiers d'un répertoire en fonction de leurs types.
 Il offre des options pour spécifier les répertoires d'entrée et de sortie, choisir entre le déplacement et la copie des fichiers,
-choisir d'écraser les fichiers déjà existant ou de les renommer, activer le mode simulation pour évaluer les actions, 
+choisir d'écraser les fichiers déjà existant ou de les renommer, activer le mode simulation pour évaluer les actions,
 effectuer le traitement silencieusement, sortir les logs dans un fichier de log externe et afficher une aide.
 
 ---
@@ -15,7 +15,7 @@ effectuer le traitement silencieusement, sortir les logs dans un fichier de log 
 ## Utilisation
 
 ```
-./script.sh [-i repertoire_entree] [-o repertoire_sortie] [-m] [-s] [-n] [-l repertoire_logs] [-e] [-h]
+./script.sh [-i repertoire_entree] [-o repertoire_sortie] [-m] [-e] [-s] [-n] [-l repertoire_logs] [-h]
     -i : Chemin du répertoire d'entrée
     -o : Chemin du répertoire de sortie
     -m : Déplacer les fichiers au lieu de les copier
