@@ -50,14 +50,14 @@ display() {
 }
 
 error() {
+    >&2 display "Error: $1\n"
+    exit "$2"
+}
+
+warning() {
     local RED="\033[0;31m"
     local RESET_COLOR="\033[0m"
-    if [ "$2" == -1 ]; then # Erreur non bloquante
-        >&2 printf "${RED}%s\n${RESET_COLOR}" "$(display "Error: $1")" 
-    else # Erreur bloquante
-        >&2 display "Error: %s\n"
-        exit "$2"
-    fi
+    >&2 printf "${RED}%s\n${RESET_COLOR}" "$(display "Error: $1")" 
 }
 
 usage() {
@@ -104,7 +104,7 @@ getExtension() {
             echo ".txt"
             ;;
         *)
-            error "Extension pour $file type $mime_type non reconnue" -1
+            warning "Extension pour $file type $mime_type non reconnue"
             echo ""
             ;;
         esac
