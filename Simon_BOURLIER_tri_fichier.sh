@@ -10,7 +10,7 @@
 # effectuer le traitement silencieusement, sortir les logs dans un fichier de log externe et afficher une aide.
 # 
 # Utilisation:
-#   Utilisation: script.sh [-i repertoire_entree] [-o repertoire_sortie] [-m] [-e] [-s] [-n] [-l repertoire_logs] [-h]
+#   Utilisation: tri_fichier.sh [-i repertoire_entree] [-o repertoire_sortie] [-m] [-e] [-s] [-n] [-l repertoire_logs] [-h]
 #
 # Options:
 #   -i : Chemin du répertoire d'entrée
@@ -23,7 +23,7 @@
 #   -h : Afficher ce message d'aide
 #
 # Exemple:
-#   script.sh -mei /chemin/vers/repertoire_entree -o /chemin/vers/repertoire_sortie -l ./vers/logs
+#   tri_fichier.sh -mei /chemin/vers/repertoire_entree -o /chemin/vers/repertoire_sortie -l ./vers/logs
 #
 # Auteur:
 #   Simon Bourlier
