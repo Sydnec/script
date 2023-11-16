@@ -1,5 +1,5 @@
 # Script de Tri de Fichiers par Types
-### Version 1.2 du 16 novembre 2023
+### Version 1.3 du 16 novembre 2023
 
 ---
 
@@ -38,4 +38,4 @@ effectuer le traitement silencieusement, sortir les logs dans un fichier de log 
 
 ## Auteur
 
-Sydnec
+Simon Bourlier
