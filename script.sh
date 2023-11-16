@@ -1,7 +1,7 @@
 #!/bin/bash
 #
 # Script de Tri de Fichiers par Types
-# Version 1.2 du 16 novembre 2023
+# Version 1.3 du 16 novembre 2023
 #
 # Description:
 # Ce script Bash permet de trier les fichiers d'un répertoire en fonction de leurs types.
@@ -31,11 +31,12 @@
 
 set -euo pipefail
 
-# Constantes de couleur
+###########################
+# Variables et constantes #
+###########################
 RED="\033[0;31m"
 RESET_COLOR="\033[0m"
 
-# Déclaration des variables
 myself=$(basename "$0") # Nom du script
 no_logs=false
 move=false
@@ -46,7 +47,9 @@ input_dir="."                                                  # Prend par défa
 output_dir="output_$(printf '%x\n' "$(date '+%Y%m%d%H%M%S')")" # Créer un dossier unique en sortie si celui-ci n'est pas renseigné
 show_usage=false
 
-# Déclaration des fonctions
+#############################
+# Déclaration des fonctions #
+#############################
 display() {
     if [ "$no_logs" == false ]; then
         [ -n "$logs_dir" ] && printf -- "$(date '+[%d/%m/%Y-%H:%M:%S]') %s\n" "$1" || printf -- "%s\n" "$1"
@@ -54,7 +57,7 @@ display() {
 }
 
 error() {
-    >&2 display "Error: $1"
+    [ -n "$logs_dir" ] && >&2 printf -- "$(date '+[%d/%m/%Y-%H:%M:%S]') Error: %s\n" "$1" || >&2 printf -- "%Error: s\n" "$1"
     exit "$2"
 }
 
@@ -94,30 +97,45 @@ getExtension() {
     local fileExt="$(file -b --extension $file | awk -F'/' '{print $1}' | sed -e 's/^ *//;s/ *$//')"
     # Tente de reconnaitre les extensions inconnues en fonction de son mime_type
     if [ "$fileExt" == "???" ]; then
-        case "$TYPE" in
-        mpeg | zip | mp4 | html)
-            echo ".$TYPE"
-            ;;
-        x-shellscript)
-            echo ".sh"
-            ;;
-        x-m4a)
-            echo ".m4a"
-            ;;
-        plain)
-            echo ".txt"
-            ;;
-        *)
-            warning "Extension pour $file type $mime_type non reconnue"
-            echo ""
-            ;;
-        esac
+        # Si le script est lancé depuis un linux, tente de chercher depuis le fichier /etc/mime.types
+        if  [ -e "/etc/mime.types" ]; then
+            fileExt=$(grep -m1 "$mime_type" /etc/mime.types | awk -F' ' '{print $2}')
+            if [ -n "$fileExt" ]; then
+                echo ".$fileExt"
+                break
+            else
+                fileExt="???"
+            fi
+        fi
+        # Sinon gère les quelques exceptions connus au cas par cas et affiche un warning s'il n'est pas trouvé
+        if [ "$fileExt" == "???" ]; then
+            case "$TYPE" in
+                mpeg | zip | mp4 | html)
+                    echo ".$TYPE"
+                    ;;
+                x-shellscript)
+                    echo ".sh"
+                    ;;
+                x-m4a)
+                    echo ".m4a"
+                    ;;
+                plain)
+                    echo ".txt"
+                    ;;
+                *)
+                    warning "Extension pour $file type $mime_type non reconnue"
+                    echo ""
+                    ;;
+            esac
+        fi
     else
         echo ".$fileExt"
     fi
 }
 
-# Traiter les options
+#######################
+# Lecture des options #
+#######################
 while getopts "i:o:mesnl:h" opt; do
     case "$opt" in
     i) # Chemin du répertoire d'entrée
@@ -151,32 +169,48 @@ while getopts "i:o:mesnl:h" opt; do
     esac
 done
 
-# Vérifier si le dossier d'entrée existe
+#################
+# Vérifications #
+#################
+# Vérifier si le dossier d'entrée existe et créer le dossier de sortie
 [ ! -d "$input_dir" ] && error "Le dossier spécifié n'existe pas." 1
+# Vérifier si les commandes utiles sont disponibles sur le systeme
+commands=("file" "awk" "sed" "mkdir" "cp" "mv" "realpath")
+for cmd in "${commands[@]}"; do
+    which "$cmd" >/dev/null 2>&1 || error "La commande '$cmd' est requise mais n'est pas installée. Abandon." 1
+done
 
 # Vérifier que le dossier n'est pas un parent du dossier de sortie
-if [[ $(realpath "$output_dir") == $(realpath "$input_dir")* ]]; then
-    if [ "$overwrite" == true ]; then
-        error "$input_dir/ est un dossier parent de $output_dir/" 1
-    else
-        while true; do
-            warning "$input_dir/ est un dossier parent de $output_dir/"
-            read -p "Voulez-vous continuer ? [O/N]" choix
-            case "$choix" in
-                [Oo])
-                    break
-                    ;;
-                [Nn])
-                    error "Abandon" 0
-                    break
-                    ;;
-                *)
-                    display "Choix non valide, Voulez-vous continuer ? [O/N]"
-                    ;;
-            esac
-        done
+if [ "$simulate" == false ]; then
+    mkdir -p "$output_dir"
+    if [[ $(realpath "$output_dir") == $(realpath "$input_dir")* ]]; then
+        if [ "$overwrite" == true ]; then
+            error "$input_dir/ est un dossier parent de $output_dir/" 1
+        else
+            while true; do
+                warning "$input_dir/ est un dossier parent de $output_dir/"
+                read -p "Voulez-vous continuer ? [O/N]" choix
+                case "$choix" in
+                    [Oo])
+                        break
+                        ;;
+                    [Nn])
+                        error "Abandon" 0
+                        break
+                        ;;
+                    *)
+                        display "Choix non valide, Voulez-vous continuer ? [O/N]"
+                        ;;
+                esac
+            done
+        fi
     fi
 fi
+
+##############
+# Traitement #
+##############
+# Créer le dossier de log et redirige les logs
 [ -n "$logs_dir" ] && mkdir -p "$logs_dir" && exec > "$logs_dir/out.log" 2> "$logs_dir/error.log"
 
 # Parcourir le dossier et ses sous-dossiers
@@ -184,7 +218,7 @@ files=$(find "$input_dir" -type f)
 total_files=$(display "$files" | wc -l | sed -e 's/^ *//;s/ *$//')
 longueur_format="%0${#total_files}d"
 processed_files=0
-# Traiter les fichiers
+# Parcourir les fichiers
 for file in $files; do
     mime_type=$(file -b --mime-type "$file" | sed -e 's/^ *//;s/ *$//')
     file_name=$(basename "$file")
@@ -215,7 +249,7 @@ for file in $files; do
 
     # Action
     if [ "$simulate" == false ]; then
-        mkdir -p "$destination_dir"
+        mkdir -p "$destination_dir" 
         [ "$move" == true ] && mv -f "$file" "$destination_dir/$file_name$file_ext" || cp -f "$file" "$destination_dir/$file_name$file_ext" # Déplacement/Copie du fichier
     fi
 done
